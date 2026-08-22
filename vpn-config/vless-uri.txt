@@ -1,0 +1,1 @@
+vless://eaaf9576-9e4c-4138-8b0f-9a4eea77e275@gordon-punch-surrey-released.trycloudflare.com:443?encryption=none&security=tls&sni=gordon-punch-surrey-released.trycloudflare.com&type=ws&host=gordon-punch-surrey-released.trycloudflare.com&path=%2F154d8c3b5d2b#Family-Auto
