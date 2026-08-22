@@ -33,6 +33,7 @@ CFD_BIN = os.path.join(TOOL_DIR, "cloudflared")
 
 TG_TOKEN = os.environ.get("TELEGRAM_BOT_TOKEN", "").strip()
 TG_CHAT = os.environ.get("TELEGRAM_CHAT_ID", "").strip()
+PUBLISH_ENABLED = os.environ.get("PUBLISH_CONFIG", "0") == "1"
 
 xray_proc = None
 cfd_proc = None
@@ -153,6 +154,39 @@ def save_config(uri):
         f.write(qr_png_bytes(uri))
 
 
+def publish_config():
+    if not PUBLISH_ENABLED:
+        return
+    status = subprocess.run(
+        ["git", "status", "--porcelain", OUT_DIR], capture_output=True, text=True
+    )
+    if not status.stdout.strip():
+        log("No config changes to publish")
+        return
+
+    def git(*args):
+        return subprocess.run(["git", *args], capture_output=True, text=True)
+
+    for cmd in (
+        ["config", "user.name", "github-actions[bot]"],
+        ["config", "user.email", "41898282+github-actions[bot]@users.noreply.github.com"],
+        ["add", OUT_DIR],
+        ["commit", "-m", f"update tunnel config [{time.strftime('%Y-%m-%d %H:%M UTC', time.gmtime())}]"],
+    ):
+        r = git(*cmd)
+        if r.returncode != 0:
+            log(f"git {cmd[0]} failed: {(r.stderr or r.stdout).strip()[:300]}")
+            return
+    for _ in range(2):
+        r = git("push")
+        if r.returncode == 0:
+            log("Config published to repo.")
+            return
+        log(f"push failed, retrying after rebase: {r.stderr.strip()[:300]}")
+        git("pull", "--rebase", "--autostash")
+    log("Config publish failed.")
+
+
 def tg_call(method, data=None, files=None):
     url = f"https://api.telegram.org/bot{TG_TOKEN}/{method}"
     resp = requests_post(url, data=data, files=files)
@@ -245,6 +279,7 @@ def main():
             host = start_tunnel()
             uri = build_uri(client_uuid, ws_path, host)
             save_config(uri)
+            publish_config()
             hours_left = max(1, int((deadline - time.time()) / 3600))
             log("=" * 56)
             log("Config is ready.")
