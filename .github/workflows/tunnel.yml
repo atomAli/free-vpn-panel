@@ -1,0 +1,53 @@
+name: family-tunnel
+
+on:
+  schedule:
+    - cron: "30 */6 * * *"
+  workflow_dispatch:
+
+concurrency:
+  group: family-tunnel
+  cancel-in-progress: false
+
+permissions:
+  contents: write
+
+jobs:
+  tunnel:
+    runs-on: ubuntu-latest
+    timeout-minutes: 355
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install dependencies
+        run: pip install --quiet requests qrcode pillow
+
+      - name: Run tunnel
+        env:
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+          TUNNEL_LIFETIME_SECONDS: "21000"
+        run: python scripts/run_tunnel.py
+
+      - name: Publish config to repo
+        if: hashFiles('vpn-config/vless-uri.txt') != ''
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add vpn-config/
+          git commit -m "update tunnel config [run ${{ github.run_id }}]" || echo "nothing to commit"
+          git pull --rebase --autostash origin ${{ github.ref_name }} || true
+          git push || (git pull --rebase origin ${{ github.ref_name }} && git push)
+
+      - name: Upload config artifact
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: vpn-config-${{ github.run_id }}
+          path: vpn-config/
+          retention-days: 3
+          if-no-files-found: ignore

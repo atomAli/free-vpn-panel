@@ -1,0 +1,63 @@
+{
+  "log": {
+    "loglevel": "warning"
+  },
+  "routing": {
+    "rules": [
+      {
+        "ip": ["geoip:private"],
+        "outboundTag": "BLOCK",
+        "type": "field"
+      },
+      {
+        "protocol": ["bittorrent"],
+        "outboundTag": "BLOCK",
+        "type": "field"
+      }
+    ]
+  },
+  "inbounds": [
+    {
+      "tag": "VLESS-REALITY-443",
+      "listen": "0.0.0.0",
+      "port": 443,
+      "protocol": "vless",
+      "settings": {
+        "clients": [],
+        "decryption": "none"
+      },
+      "streamSettings": {
+        "network": "tcp",
+        "security": "reality",
+        "realitySettings": {
+          "show": false,
+          "dest": "yahoo.com:443",
+          "xver": 0,
+          "serverNames": [
+            "yahoo.com",
+            "www.yahoo.com"
+          ],
+          "privateKey": "__PRIVATE_KEY__",
+          "shortIds": [
+            "__SHORT_ID__"
+          ]
+        }
+      },
+      "sniffing": {
+        "enabled": true,
+        "destOverride": ["http", "tls"],
+        "routeOnly": false
+      }
+    }
+  ],
+  "outbounds": [
+    {
+      "protocol": "freedom",
+      "tag": "DIRECT"
+    },
+    {
+      "protocol": "blackhole",
+      "tag": "BLOCK"
+    }
+  ]
+}

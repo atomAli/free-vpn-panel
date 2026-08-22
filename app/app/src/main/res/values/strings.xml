@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">پنل خانواده</string>
+    <string name="app_title">تونل خانوادگی</string>
+    <string name="app_subtitle">یک دکمه، یک کانفیگ دائمی</string>
+    <string name="fetch_config">دریافت کانفیگ از سرور</string>
+    <string name="scan_qr">اسکن QR کانفیگ</string>
+    <string name="fetching">در حال دریافت کانفیگ…</string>
+    <string name="fetch_failed">دریافت ناموفق؛ اینترنت را چک کنید یا QR را امتحان کنید</string>
+    <string name="or_manual">یا وارد کردن دستی کانفیگ:</string>
+    <string name="manual_hint">vless://…</string>
+    <string name="submit_manual">ثبت کانفیگ</string>
+</resources>
