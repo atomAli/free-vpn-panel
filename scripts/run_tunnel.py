@@ -54,11 +54,12 @@ def install_tools():
 
     if not os.path.exists(XRAY_BIN):
         log("Downloading Xray-Core ...")
+        xdir = os.path.join(TOOL_DIR, "xray")
+        os.makedirs(xdir, exist_ok=True)
         zpath = os.path.join(TOOL_DIR, "xray.zip")
-        os.makedirs(os.path.dirname(zpath), exist_ok=True)
         download(XRAY_URL, zpath)
         with zipfile.ZipFile(zpath) as zf:
-            zf.extractall(os.path.dirname(zpath))
+            zf.extractall(xdir)
         os.chmod(XRAY_BIN, 0o755)
 
     if not os.path.exists(CFD_BIN):
