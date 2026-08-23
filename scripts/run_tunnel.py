@@ -31,6 +31,15 @@ CFD_URL = (
 XRAY_BIN = os.path.join(TOOL_DIR, "xray", "xray")
 CFD_BIN = os.path.join(TOOL_DIR, "cloudflared")
 
+# IPهای anycast کلادفلر برای دور زدن فیلترینگ DNS/IP در ایران.
+# با متغیر محیطی CLEAN_IPS (جداشده با کاما) قابل جایگزینی است.
+DEFAULT_CLEAN_IPS = [
+    "104.16.160.1",
+    "104.17.147.22",
+    "172.67.68.228",
+    "188.114.97.7",
+]
+
 TG_TOKEN = os.environ.get("TELEGRAM_BOT_TOKEN", "").strip()
 TG_CHAT = os.environ.get("TELEGRAM_CHAT_ID", "").strip()
 PUBLISH_ENABLED = os.environ.get("PUBLISH_CONFIG", "0") == "1"
@@ -71,7 +80,7 @@ def install_tools():
     log("Tools ready.")
 
 
-def build_uri(client_uuid, ws_path, tunnel_host):
+def build_uri(client_uuid, ws_path, tunnel_host, address=None):
     params = {
         "encryption": "none",
         "security": "tls",
@@ -80,8 +89,18 @@ def build_uri(client_uuid, ws_path, tunnel_host):
         "host": tunnel_host,
         "path": ws_path,
     }
-    uri = f"vless://{client_uuid}@{tunnel_host}:443?" + urllib.parse.urlencode(params)
-    return uri + "#Family-Auto"
+    uri = f"vless://{client_uuid}@{address or tunnel_host}:443?" + urllib.parse.urlencode(params)
+    return uri
+
+
+def build_uris(client_uuid, ws_path, tunnel_host):
+    """کانفیگ اصلی + نسخه‌های Clean IP برای ISPهایی که دامنه trycloudflare را فقط با DNS/IP می‌بندند."""
+    uris = [build_uri(client_uuid, ws_path, tunnel_host) + "#Family-Auto"]
+    raw = os.environ.get("CLEAN_IPS", "").strip()
+    ips = [s.strip() for s in raw.split(",") if s.strip()] or DEFAULT_CLEAN_IPS
+    for i, ip in enumerate(ips):
+        uris.append(build_uri(client_uuid, ws_path, tunnel_host, ip) + f"#Family-Auto-CF{i + 1}")
+    return uris
 
 
 def start_xray(client_uuid, ws_path):
@@ -147,11 +166,11 @@ def qr_png_bytes(text):
     return buf.getvalue()
 
 
-def save_config(uri):
+def save_config(uris):
     with open(os.path.join(OUT_DIR, "vless-uri.txt"), "w") as f:
-        f.write(uri + "\n")
+        f.write("\n".join(uris) + "\n")
     with open(os.path.join(OUT_DIR, "qr.png"), "wb") as f:
-        f.write(qr_png_bytes(uri))
+        f.write(qr_png_bytes(uris[0]))
 
 
 def publish_config():
@@ -200,7 +219,9 @@ def notify_new_config(uri, tunnel_host, hours_left):
     caption = (
         "کانفیگ جدید آماده شد\n"
         f"اعتبار: حدود {hours_left} ساعت\n"
-        f"تونل: {tunnel_host}\n\n"
+        f"تونل: {tunnel_host}\n"
+        "در ایران وصل نشد؟ در v2rayNG فعال کن: Fragment = tlshello، "
+        "یا نسخه‌های CF1 تا CF4 را از vless-uri.txt امتحان کن\n\n"
         f"{uri}"
     )
     photo = qr_png_bytes(uri)
@@ -277,16 +298,17 @@ def main():
         while True:
             log("Building Cloudflare quick tunnel (~10s) ...")
             host = start_tunnel()
-            uri = build_uri(client_uuid, ws_path, host)
-            save_config(uri)
+            uris = build_uris(client_uuid, ws_path, host)
+            save_config(uris)
             publish_config()
             hours_left = max(1, int((deadline - time.time()) / 3600))
             log("=" * 56)
             log("Config is ready.")
-            log(uri)
+            for u in uris:
+                log(u)
             log(f"Tunnel host: {host}")
             log("=" * 56)
-            notify_safe(notify_new_config, uri, host, hours_left)
+            notify_safe(notify_new_config, uris[0], host, hours_left)
 
             failures = 0
             while time.time() < deadline:
