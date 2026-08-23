@@ -1,13 +1,1 @@
-*.iml
-.gradle/
-.idea/
 .DS_Store
-build/
-local.properties
-captures/
-.externalNativeBuild/
-.cxx/
-
-# خروجی‌های بیلد که لازم نیست تو ریپو باشن
-app/app/build/
-FamilyVpnPanel-*-debug.apk

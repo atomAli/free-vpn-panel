@@ -1,7 +1,0 @@
-name = "family-vpn"
-main = "vless-worker.js"
-compatibility_date = "2024-09-23"
-
-[vars]
-# برای تغییر UUID این خط را از کامنت خارج کنید و مقدار جدید بگذارید:
-# UUID = "408f6245-caf9-4432-81c5-e337ebc479c0"
