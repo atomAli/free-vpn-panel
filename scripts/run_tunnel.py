@@ -95,11 +95,12 @@ def build_uri(client_uuid, ws_path, tunnel_host, address=None):
 
 def build_uris(client_uuid, ws_path, tunnel_host):
     """کانفیگ اصلی + نسخه‌های Clean IP برای ISPهایی که دامنه trycloudflare را فقط با DNS/IP می‌بندند."""
-    uris = [build_uri(client_uuid, ws_path, tunnel_host) + "#Family-Auto"]
+    ts = time.strftime("%H:%M")
+    uris = [build_uri(client_uuid, ws_path, tunnel_host) + f"#Family-Auto ({ts})"]
     raw = os.environ.get("CLEAN_IPS", "").strip()
     ips = [s.strip() for s in raw.split(",") if s.strip()] or DEFAULT_CLEAN_IPS
     for i, ip in enumerate(ips):
-        uris.append(build_uri(client_uuid, ws_path, tunnel_host, ip) + f"#Family-Auto-CF{i + 1}")
+        uris.append(build_uri(client_uuid, ws_path, tunnel_host, ip) + f"#Family-Auto-CF{i + 1} ({ts})")
     return uris
 
 
