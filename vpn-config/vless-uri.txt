@@ -1,1 +1,1 @@
-vless://eaaf9576-9e4c-4138-8b0f-9a4eea77e275@gordon-punch-surrey-released.trycloudflare.com:443?encryption=none&security=tls&sni=gordon-punch-surrey-released.trycloudflare.com&type=ws&host=gordon-punch-surrey-released.trycloudflare.com&path=%2F154d8c3b5d2b#Family-Auto
+vless://4b026e55-bbf1-4b69-9f51-a9a51df04de2@mitchell-era-powerseller-customize.trycloudflare.com:443?encryption=none&security=tls&sni=mitchell-era-powerseller-customize.trycloudflare.com&type=ws&host=mitchell-era-powerseller-customize.trycloudflare.com&path=%2F280c92889743#Family-Auto
