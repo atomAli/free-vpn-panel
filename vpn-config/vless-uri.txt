@@ -1,1 +1,1 @@
-vless://4b026e55-bbf1-4b69-9f51-a9a51df04de2@mitchell-era-powerseller-customize.trycloudflare.com:443?encryption=none&security=tls&sni=mitchell-era-powerseller-customize.trycloudflare.com&type=ws&host=mitchell-era-powerseller-customize.trycloudflare.com&path=%2F280c92889743#Family-Auto
+vless://559d0850-9fa9-4f0f-be70-7a31d86a7acb@ampland-sailing-terrorism-according.trycloudflare.com:443?encryption=none&security=tls&sni=ampland-sailing-terrorism-according.trycloudflare.com&type=ws&host=ampland-sailing-terrorism-according.trycloudflare.com&path=%2Fe226354b0dda#Family-Auto
