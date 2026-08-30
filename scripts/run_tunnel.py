@@ -188,8 +188,8 @@ def publish_config():
         return subprocess.run(["git", *args], capture_output=True, text=True)
 
     for cmd in (
-        ["config", "user.name", "github-actions[bot]"],
-        ["config", "user.email", "41898282+github-actions[bot]@users.noreply.github.com"],
+        ["config", "user.name", "Ali Arjmandi"],
+        ["config", "user.email", "aliAtom@users.noreply.github.com"],
         ["add", OUT_DIR],
         ["commit", "-m", f"update tunnel config [{time.strftime('%Y-%m-%d %H:%M UTC', time.gmtime())}]"],
     ):
